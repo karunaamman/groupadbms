@@ -1,11 +1,11 @@
-use inventory_management_system;
+use inventory_management_system_backup;
 -- 1 count the products-> fn_ProductCount() ===========================================================
 
 DELIMITER #
 CREATE FUNCTION fn_ProductCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE productCount INT;
-    SELECT COUNT(id) into productCount FROM inventory_management_system.products;
+    SELECT COUNT(id) into productCount FROM products;
     RETURN productCount;
 END #
 DELIMITER ;
@@ -19,7 +19,7 @@ DELIMITER #
 CREATE FUNCTION fn_CategoriesCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE categoriesCount INT;
-    SELECT COUNT(id) INTO categoriesCount FROM inventory_management_system.categories;
+    SELECT COUNT(id) INTO categoriesCount FROM categories;
     RETURN categoriesCount;
 END #
 DELIMITER ;
@@ -32,12 +32,25 @@ DELIMITER #
 CREATE FUNCTION fn_OrdersCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE ordersCount INT;
-    SELECT COUNT(id) INTO ordersCount FROM inventory_management_system.categories;
+    SELECT COUNT(id) INTO ordersCount FROM orders;
     RETURN ordersCount;
 END #
 DELIMITER ;
 
 SELECT fn_OrdersCount();
+
+-- 3.1 count the Completed Orders-> fn_CompletedOrdersCount() =====================================================
+
+DELIMITER #
+CREATE FUNCTION fn_CompletedOrdersCount() RETURNS INT DETERMINISTIC
+BEGIN
+	DECLARE completedOrdersCount INT;
+    SELECT COUNT(id) INTO completedOrdersCount FROM orders WHERE order_status=1;
+    RETURN completedOrdersCount;
+END #
+DELIMITER ;
+
+SELECT fn_CompletedOrdersCount();
 
 -- 4 count the Purchases-> fn_PurchsesCount() =====================================================
 
@@ -45,7 +58,7 @@ DELIMITER #
 CREATE FUNCTION fn_PurchasesCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE purchsesCount INT;
-    SELECT COUNT(id) INTO purchsesCount FROM inventory_management_system.purchases;
+    SELECT COUNT(id) INTO purchsesCount FROM purchases;
     RETURN purchsesCount;
 END #
 DELIMITER ;
@@ -59,7 +72,7 @@ DELIMITER #
 CREATE FUNCTION fn_TodayPurchasesCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE todayPurchsesCount INT;
-    SELECT COUNT(id) INTO todayPurchsesCount FROM inventory_management_system.purchases WHERE STR_TO_DATE(date, '%Y-%m-%d') = current_date();
+    SELECT COUNT(id) INTO todayPurchsesCount FROM purchases WHERE STR_TO_DATE(date, '%Y-%m-%d') = current_date();
     RETURN todayPurchsesCount;
 END #
 DELIMITER ;
@@ -72,7 +85,7 @@ DELIMITER #
 CREATE FUNCTION fn_QuotationsCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE quotationsCount INT;
-    SELECT COUNT(id) INTO quotationsCount FROM inventory_management_system.quotations;
+    SELECT COUNT(id) INTO quotationsCount FROM quotations;
     RETURN quotationsCount;
 END #
 DELIMITER ;
@@ -86,7 +99,7 @@ DELIMITER #
 CREATE FUNCTION fn_TodayQuotationsCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE todayQuotationsCount INT;
-    SELECT COUNT(id) INTO todayQuotationsCount FROM inventory_management_system.quotations 
+    SELECT COUNT(id) INTO todayQuotationsCount FROM quotations 
         WHERE STR_TO_DATE(date, '%Y-%m-%d') = current_date();
     RETURN todayQuotationsCount;
 END #
