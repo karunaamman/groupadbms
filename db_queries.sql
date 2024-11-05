@@ -32,12 +32,25 @@ DELIMITER #
 CREATE FUNCTION fn_OrdersCount() RETURNS INT DETERMINISTIC
 BEGIN
 	DECLARE ordersCount INT;
-    SELECT COUNT(id) INTO ordersCount FROM categories;
+    SELECT COUNT(id) INTO ordersCount FROM orders;
     RETURN ordersCount;
 END #
 DELIMITER ;
 
 SELECT fn_OrdersCount();
+
+-- 3.1 count the Completed Orders-> fn_CompletedOrdersCount() =====================================================
+
+DELIMITER #
+CREATE FUNCTION fn_CompletedOrdersCount() RETURNS INT DETERMINISTIC
+BEGIN
+	DECLARE completedOrdersCount INT;
+    SELECT COUNT(id) INTO completedOrdersCount FROM orders WHERE order_status=1;
+    RETURN completedOrdersCount;
+END #
+DELIMITER ;
+
+SELECT fn_CompletedOrdersCount();
 
 -- 4 count the Purchases-> fn_PurchsesCount() =====================================================
 
