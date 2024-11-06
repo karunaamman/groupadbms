@@ -106,3 +106,24 @@ END #
 DELIMITER ;
 
 SELECT fn_TodayQuotationsCount();
+
+
+-- 8 InvoiceGenerate ===========================================================================================
+DELIMITER #
+CREATE FUNCTION fn_InvoiceGenerate() RETURNS VARCHAR(20) DETERMINISTIC
+BEGIN
+    DECLARE lastInvNo VARCHAR(20);
+    DECLARE lastInvNum BIGINT;
+    DECLARE newInvNo VARCHAR(20);
+
+    SELECT invoice_no INTO lastInvNo FROM orders 
+    ORDER BY STR_TO_DATE(order_date, '%Y-%m-%d %H:%i:%s') DESC LIMIT 1;
+    
+    SET lastInvNum = CAST(SUBSTRING(lastInvNo, 5) AS UNSIGNED) + 1;
+    SET newInvNo = CONCAT('INV-', lastInvNum);
+    RETURN newInvNo;
+END #
+DELIMITER ;
+
+SELECT fn_InvoiceGenerate();
+
