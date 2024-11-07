@@ -63,4 +63,8 @@ class ProductExportController extends Controller
             return;
         }
     }
+   
+   public function restore(){
+    DB::select("CALL sp_RestoreLatestUpdatedProduct()");
+   }
 }

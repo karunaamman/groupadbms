@@ -237,3 +237,167 @@ BEGIN
 END $$
 DELIMITER ;
 CALL sp_RestoreProduct(2);
+
+-- sp_GetSupplierDetailsById ---------------------------------------------
+DELIMITER #
+CREATE PROCEDURE sp_GetSupplierDetailsById (
+    IN in_supplier_id INT
+)
+BEGIN
+    SELECT 
+        id,
+        name,
+        email,
+        phone,
+        address,
+        shopname,
+        type,
+        photo,
+        account_number,
+        bank_name
+    FROM 
+        suppliers
+    WHERE 
+        id = in_supplier_id;
+END #
+DELIMITER ;
+
+
+-- sp_UpdateSupplier --------------------------------------------
+DELIMITER //
+CREATE PROCEDURE sp_UpdateSupplier(
+    IN in_id INT,
+    IN in_name VARCHAR(255),
+    IN in_email VARCHAR(255),
+    IN in_phone VARCHAR(20),
+    IN in_address TEXT,
+    IN in_shopname VARCHAR(255),
+    IN in_type VARCHAR(50),
+    IN in_photo BLOB,
+    IN in_account_holder VARCHAR(255),
+    IN in_account_number VARCHAR(50),
+    IN in_bank_name VARCHAR(255)
+)
+BEGIN
+    UPDATE suppliers
+    SET 
+        name = in_name,
+        email = in_email,
+        phone = in_phone,
+        address = in_address,
+        shopname = in_shopname,
+        type = in_type,
+        photo = in_photo,
+        account_holder = in_account_holder,
+        account_number = in_account_number,
+        bank_name = in_bank_name,
+        updated_at = CURRENT_TIMESTAMP()
+    WHERE 
+        id = in_id;
+END //
+DELIMITER ;
+
+-- sp_DeleteSupplier --------------------------------------
+DELIMITER //
+CREATE PROCEDURE sp_DeleteSupplier(
+    IN in_supplier_id INT
+)
+BEGIN
+    DELETE FROM suppliers
+    WHERE id = in_supplier_id;
+END //
+DELIMITER ;
+
+-- sp_InsertSupplier ---------------------------------------
+DELIMITER //
+CREATE PROCEDURE sp_InsertSupplier(
+    IN in_name VARCHAR(100),
+    IN in_email VARCHAR(100),
+    IN in_phone VARCHAR(15),
+    IN in_address VARCHAR(255),
+    IN in_shopname VARCHAR(100),
+    IN in_type VARCHAR(50),
+    IN in_photo BLOB,
+    IN in_account_holder VARCHAR(100),
+    IN in_account_number VARCHAR(50),
+    IN in_bank_name VARCHAR(100)
+)
+BEGIN
+    INSERT INTO suppliers (name,email,phone,address,shopname,type,photo,account_holder,account_number,bank_name,created_at,updated_at)
+    VALUES (
+        in_name,
+        in_email,
+        in_phone,
+        in_address,
+        in_shopname,
+        in_type,
+        in_photo,
+        in_account_holder,
+        in_account_number,
+        in_bank_name,
+        CURRENT_TIMESTAMP(),
+        CURRENT_TIMESTAMP()
+    );
+END //
+DELIMITER ;
+
+---  sp_UpdateUser -------------------------
+DELIMITER $$
+CREATE PROCEDURE sp_UpdateUser(
+    IN p_id INT,
+    IN p_name VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_username VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_image VARCHAR(255)
+)
+BEGIN
+    UPDATE users
+    SET name = p_name,
+        email = p_email,
+        username = p_username,
+        password = p_password,
+        image = p_image
+    WHERE id = p_id;
+END $$
+DELIMITER ;
+
+-----  sp_InsertUser -----------------------------------
+DELIMITER //
+CREATE PROCEDURE sp_InsertUser(
+    IN p_name VARCHAR(255),
+    IN p_email VARCHAR(255),
+    IN p_username VARCHAR(255),
+    IN p_password VARCHAR(255),
+    IN p_image BLOB
+)
+BEGIN
+    INSERT INTO users (name, email, username, password, image)
+    VALUES (p_name, p_email, p_username, p_password, p_image);
+END //
+DELIMITER ;
+
+
+----  sp_DeleteUser ------------------------------------
+DELIMITER $$
+CREATE PROCEDURE sp_DeleteUser(
+    IN p_id INT
+)
+BEGIN
+    DELETE FROM users
+    WHERE id = p_id;
+END $$
+DELIMITER ;
+
+
+-- sp_GetUserDetails --------------------
+DELIMITER $$
+CREATE PROCEDURE sp_GetUserDetails(
+    IN p_id INT
+)
+BEGIN
+    SELECT name, email, username, password, image
+    FROM users
+    WHERE id = p_id;
+END $$
+DELIMITER ;

@@ -63,6 +63,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/products/import', [ProductImportController::class, 'store'])->name('products.import.store');
     Route::get('/products/export', [ProductExportController::class, 'create'])->name('products.export.store');
     Route::resource('/products', ProductController::class);
+    Route::get('/productrestore', [ProductExportController::class, 'restore'])->name('products.export.restore');
+
 
     // Route Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
