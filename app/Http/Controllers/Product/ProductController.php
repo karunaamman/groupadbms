@@ -161,7 +161,8 @@ $categories = collect(DB::select("SELECT * FROM categories WHERE slug = ?", [$sl
             unlink(public_path('storage/products/') . $product->product_image);
         }
 
-        $product->delete();
+      //  $product->delete();
+      $restore=  DB::select("CALL sp_UpdateCurrentTimeAndDelete($product->id)");
 
         return redirect()
             ->route('products.index')
