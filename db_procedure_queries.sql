@@ -1,48 +1,65 @@
--- sp_CreateOrder
+-- sp_InsertOrder -----
 DELIMITER #
-CREATE PROCEDURE sp_CreateOrder(IN customerId INT, OUT OrderId INT)
+CREATE PROCEDURE sp_InsertOrder(
+    IN p_customer_id INT,
+    OUT p_order_id INT
+)
 BEGIN
-    DECLARE InvoiceNo VARCHAR(30);
-    SET InvoiceNo = fn_InvoiceGenerate();
+    DECLARE new_invoice_no VARCHAR(20);
+    -- Generate the invoice number using the fn_InvoiceGenerate function
+    SET new_invoice_no = fn_InvoiceGenerate();
 
-    INSERT INTO orders(customer_id, order_date, order_status, invoice_no)
-    VALUES (customerId, CURRENT_TIMESTAMP(), 0, InvoiceNo);
+    -- Insert a new order with customer_id, generated invoice number, and current timestamp for order_date
+    INSERT INTO orders (customer_id, invoice_no, order_date)
+    VALUES (p_customer_id, new_invoice_no, CURRENT_TIMESTAMP());
 
-    -- Get the newly created OrderId and return InvoiceNo as well
-    SELECT id INTO OrderId FROM orders ORDER BY id DESC LIMIT 1;
+    -- Get the last inserted order_id and set it as the OUT parameter
+    SET p_order_id = LAST_INSERT_ID();
 END #
 DELIMITER ;
+
+call sp_InsertOrder(80,@orderid);
+SELECT @orderid;
+
 
 -- sp_AddOrderDetails
 DELIMITER #
-CREATE PROCEDURE sp_AddOrderDetails(IN OrderID INT, IN ProductID INT, IN Quantity INT)
+CREATE PROCEDURE sp_InsertOrderDetails(
+    IN p_order_id INT,
+    IN p_product_id INT,
+    IN p_quantity INT
+)
 BEGIN
-    DECLARE UnitPrice DECIMAL(15,2);
-    DECLARE Total DECIMAL(15,2);
-    DECLARE AvailableProductAmount INT;
+    DECLARE available_quantity INT;
+    DECLARE unitPrice DECIMAL(10, 2);
+    DECLARE totalPrice DECIMAL(10, 2);
 
-    SELECT quantity INTO AvailableProductAmount FROM products WHERE id = ProductID;
+    -- Check the available quantity and selling price of the product in the products table
+    SELECT quantity, selling_price INTO available_quantity, unitPrice
+    FROM products
+    WHERE id = p_product_id;
 
-    -- Check if the product exists
-    IF (SELECT COUNT(*) FROM products WHERE id = ProductID) = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Product not found';
-    ELSEIF AvailableProductAmount IS NULL OR Quantity > AvailableProductAmount THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient Product Quntity';
+    -- Verify if the available quantity is sufficient
+    IF available_quantity >= p_quantity THEN
+        -- Calculate total cost
+        SET totalPrice = unitPrice * p_quantity;
+
+        -- Insert the order details into the order_details table
+        INSERT INTO order_details (order_id, product_id, quantity, unitcost, total)
+        VALUES (p_order_id, p_product_id, p_quantity, unitPrice, totalPrice);
+
+        -- Update the product quantity in the products table
+        UPDATE products
+        SET quantity = quantity - p_quantity
+        WHERE id = p_product_id;
     ELSE
-        -- Retrieve Unit Price for the product
-        SELECT selling_price INTO UnitPrice FROM products WHERE id = ProductID;
-
-        -- Calculate Total for the line item
-        SET Total = Quantity * UnitPrice;
-
-        -- Insert into order_details table
-        INSERT INTO order_details(order_id, product_id, quantity, unitcost, total)
-        VALUES (OrderID, ProductID, Quantity, UnitPrice, Total);
-
-        Update products Set quantity = (AvailableProductAmount-Quantity) WHERE id = ProductID;
+        -- Raise an error if there's insufficient stock
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Insufficient quantity in stock for the requested product';
     END IF;
 END #
 DELIMITER ;
+call sp_InsertOrderDetails(@orderid,9,2);
 
 -- sp_GetOrderDetailsById ----------------------------------------------
 
@@ -187,9 +204,7 @@ CALL sp_UpdateProduct(
     'Updated notes'      -- notes
 );
 
--- CREATE DELETED_PRODUCTS TABLE --------
-CREATE TABLE IF NOT EXISTS deleted_products AS SELECT * FROM products WHERE 1 = 0;
-ALTER TABLE deleted_products ADD PRIMARY KEY(id);
+
 
 -- sp_DeleteProductById ----------
 DELIMITER $$
@@ -204,18 +219,6 @@ BEGIN
 END $$
 DELIMITER ;
 CALL sp_DeleteProductById(2);
-
--- trg_BeforeProductDelete ----
-DELIMITER $$
-CREATE TRIGGER trg_BeforeProductDelete
-BEFORE DELETE ON products
-FOR EACH ROW
-BEGIN
-    -- Insert the deleted product into deleted_products table
-    INSERT INTO deleted_products (id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at)
-    VALUES (OLD.id, OLD.name, OLD.slug, OLD.code, OLD.quantity, OLD.buying_price, OLD.selling_price, OLD.quantity_alert, OLD.tax, OLD.tax_type, OLD.notes, OLD.product_image, OLD.category_id, OLD.unit_id, OLD.created_at, OLD.updated_at);
-END $$
-DELIMITER ;
 
 -- sp_RestoreProduct ----
 DELIMITER $$
