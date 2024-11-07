@@ -19,6 +19,7 @@ use App\Http\Controllers\Dashboards\DashboardController;
 use App\Http\Controllers\Product\ProductExportController;
 use App\Http\Controllers\Product\ProductImportController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -100,6 +101,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchases/{purchase}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
     Route::put('/purchases/{purchase}/edit', [PurchaseController::class, 'update'])->name('purchases.update');
     Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
+
+    Route::get('/purchases/pending', [PurchaseController::class, 'pendingPurchases'])->name('purchases.pending-purchases');
+
 });
 
 require __DIR__.'/auth.php';
