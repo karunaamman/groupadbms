@@ -15,6 +15,8 @@ class DashboardController extends Controller
 {
     public function index()
 {
+    $monthly_order = collect(DB::select("select * from vw_MonthlyOrders"));
+    $monthly_purchase = collect(DB::select("select * from vw_MonthlyPurchases"));
     $orders = DB::select("SELECT fn_OrdersCount()")[0]->{"fn_OrdersCount()"};
     $completedOrders = DB::select("SELECT fn_CompletedOrdersCount()")[0]->{"fn_CompletedOrdersCount()"};
     $products = DB::select("SELECT fn_ProductCount()")[0]->{"fn_ProductCount()"};
@@ -33,6 +35,8 @@ class DashboardController extends Controller
         'categories' => $categories,
         'quotations' => $quotations,
         'todayQuotations' => $todayQuotations,
+        'monthlyorder'=>  $monthly_order,
+        'monthly_purchase'=>  $monthly_purchase,
     ]);
 }
 }
