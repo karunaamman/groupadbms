@@ -1,6 +1,6 @@
--- Trigger trg_after_insert_order_details ------------------------------
+-- Trigger trg_AfterInsertOrderDetails ------------------------------
 DELIMITER #
-CREATE TRIGGER trg_after_insert_order_details
+CREATE TRIGGER trg_AfterInsertOrderDetails
 AFTER INSERT ON order_details FOR EACH ROW
 BEGIN
     DECLARE TotalProducts INT;
@@ -42,4 +42,44 @@ BEGIN
     INSERT INTO deleted_products (id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at)
     VALUES (OLD.id, OLD.name, OLD.slug, OLD.code, OLD.quantity, OLD.buying_price, OLD.selling_price, OLD.quantity_alert, OLD.tax, OLD.tax_type, OLD.notes, OLD.product_image, OLD.category_id, OLD.unit_id, OLD.created_at, OLD.updated_at);
 END $$
+DELIMITER ;
+
+-- trg_ChangeOrdersUpdateAtTimestamp ------------------------------------
+DELIMITER #
+CREATE TRIGGER trg_ChangeOrdersUpdateAtTimestamp
+BEFORE UPDATE ON orders
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP();
+END #
+DELIMITER ;
+
+-- trg_ChangeOrderDetailsUpdateAtTimestamp ------------------------------
+DELIMITER #
+CREATE TRIGGER trg_ChangeOrderDetailsUpdateAtTimestamp
+BEFORE UPDATE ON order_details
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP();
+END #
+DELIMITER ;
+
+-- trg_ChangeProductsUpdateAtTimestamp ------------------------------
+DELIMITER #
+CREATE TRIGGER trg_ChangeProductsUpdateAtTimestamp
+BEFORE UPDATE ON products
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP();
+END #
+DELIMITER ;
+
+-- trg_ChangeCategoriesUpdateAtTimestamp ------------------------------
+DELIMITER #
+CREATE TRIGGER trg_ChangeCategoriesUpdateAtTimestamp
+BEFORE UPDATE ON categories
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = CURRENT_TIMESTAMP();
+END #
 DELIMITER ;
