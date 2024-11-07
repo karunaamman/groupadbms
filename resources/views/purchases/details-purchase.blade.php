@@ -93,13 +93,13 @@
             </div>
         </div>
 
-        <div class="col-xl-12">
+        {{-- <div class="col-xl-12">
             <div class="card mb-4 mb-xl-0">
                 <div class="card-header">
                     List Product
-                </div>
+                </div> --}}
 
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <div class="col-lg-12">
                         <div class="table-responsive">
                             <table class="table table-striped align-middle">
@@ -140,7 +140,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>
 @endsection

@@ -21,20 +21,34 @@ class PurchaseController extends Controller
 {
     public function index()
     {
-        return view('purchases.index', [
-            'purchases' => Purchase::latest()->get(),
-        ]);
+        $purchases = DB::select("SELECT * FROM purchases ORDER BY created_at DESC");
+
+        return view('purchases.index', compact('purchases'));
     }
 
     public function approvedPurchases()
     {
-        $purchases = Purchase::with(['supplier'])
-            ->where('status', PurchaseStatus::APPROVED)->get(); // 1 = approved
+        // $purchases = Purchase::with(['supplier'])
+        //     ->where('status', PurchaseStatus::APPROVED)->get(); // 1 = approved\
 
-        return view('purchases.approved-purchases', [
-            'purchases' => $purchases,
-        ]);
+        //     // dd($purchases);
+
+        // return view('purchases.approved-purchases', [
+        //     'purchases' => $purchases,
+        // ]);
+
+        $approvedStatus = PurchaseStatus::PENDING->value;
+
+        $purchases = DB::select("SELECT purchases.*, suppliers.name AS supplier_name
+                                 FROM purchases
+                                 JOIN suppliers ON purchases.supplier_id = suppliers.id
+                                 WHERE purchases.status = ?", [$approvedStatus]);
+
+        // dd($purchases);
+
+        return view('purchases.approved-purchases', compact('purchases'));
     }
+
 
     public function show(Purchase $purchase)
     {
@@ -46,7 +60,50 @@ class PurchaseController extends Controller
             'purchase' => $purchase,
             'products' => $products
         ]);
+
+        // Main purchase record with its relationships using raw SQL
+
+        // dd($products);
+
     }
+
+
+
+// public function show(Purchase $purchase)
+// {
+//     // Load purchase details using raw SQL
+//     $purchaseData = DB::select("
+//         SELECT p.*, s.name AS supplier_name, u1.name AS created_by_name, u2.name AS updated_by_name
+//         FROM purchases p
+//         LEFT JOIN suppliers s ON p.supplier_id = s.id
+//         LEFT JOIN users u1 ON p.created_by = u1.id
+//         LEFT JOIN users u2 ON p.updated_by = u2.id
+//         WHERE p.id = ?
+//     ", [$purchase->id]);
+
+//     // Load purchase details
+//     $products = DB::select("
+//         SELECT pd.*, pr.name AS product_name, pr.code AS product_code, pr.product_image
+//         FROM purchase_details pd
+//         LEFT JOIN products pr ON pd.product_id = pr.id
+//         WHERE pd.purchase_id = ?
+//     ", [$purchase->id]);
+
+//     // Assuming there's only one purchase data row returned
+//     $purchase = (object) $purchaseData[0]; // Casting to object to mimic Eloquent behavior
+
+//     // return view('purchases.details-purchase', [
+//     //     'purchase' => $purchase,
+//     //     'products' => $products
+//     // ]);
+
+//     dd($purchase,$products);
+// }
+
+
+
+
+
 
     public function edit(Purchase $purchase)
     {
@@ -60,10 +117,20 @@ class PurchaseController extends Controller
 
     public function create()
     {
+        // return view('purchases.create', [
+        //     'categories' => Category::select(['id', 'name'])->get(),
+        //     'suppliers' => Supplier::select(['id', 'name'])->get(),
+        // ]);
+        $categories = DB::select("SELECT id, name FROM categories");
+
+        // Fetch suppliers with raw SQL
+        $suppliers = DB::select("SELECT id, name FROM suppliers");
+
         return view('purchases.create', [
-            'categories' => Category::select(['id', 'name'])->get(),
-            'suppliers' => Supplier::select(['id', 'name'])->get(),
+            'categories' => $categories,
+            'suppliers' => $suppliers,
         ]);
+
     }
 
     public function store(StorePurchaseRequest $request)
@@ -89,10 +156,77 @@ class PurchaseController extends Controller
             }
         }
 
+
+
+
         return redirect()
             ->route('purchases.index')
             ->with('success', 'Purchase has been created!');
     }
+
+
+    // public function store(Request $request)
+    // {
+    //     // Validate input data
+    //     // $request->validate([
+    //     //     'purchase_no' => 'required|string|max:255',
+    //     //     'purchase_date' => 'required|date',
+    //     //     'supplier_id' => 'required|integer',
+    //     //     'created_by' => 'required|integer',
+    //     //     'updated_by' => 'nullable|integer',
+    //     //     'status' => 'required|boolean',
+    //     //     'total_amount' => 'required|numeric',
+    //     //     'invoiceProducts.*.product_id' => 'required|integer',
+    //     //     'invoiceProducts.*.quantity' => 'required|integer',
+    //     //     'invoiceProducts.*.unitcost' => 'required|numeric',
+    //     //     'invoiceProducts.*.total' => 'required|numeric',
+    //     // ]);
+
+    //     // try {
+    //     //     // Insert the main purchase record using raw SQL
+    //     //     DB::insert("
+    //     //         INSERT INTO purchases (purchase_no, purchase_date, supplier_id, created_by, updated_by, status, total_amount, created_at, updated_at)
+    //     //         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    //     //     ", [
+    //     //         $request->purchase_no,
+    //     //         $request->purchase_date,
+    //     //         $request->supplier_id,
+    //     //         $request->created_by,
+    //     //         $request->updated_by,
+    //     //         $request->status,
+    //     //         $request->total_amount,
+    //     //         Carbon::now(),
+    //     //         Carbon::now()
+    //     //     ]);
+
+    //     //     // Get the ID of the newly inserted purchase record
+    //     //     $purchaseId = DB::getPdo()->lastInsertId();
+
+    //     //     // Check and insert purchase details if invoiceProducts are provided
+    //     //     if ($request->invoiceProducts) {
+    //     //         $values = [];
+    //     //         foreach ($request->invoiceProducts as $product) {
+    //     //             $values[] = "($purchaseId, {$product['product_id']}, {$product['quantity']}, {$product['unitcost']}, {$product['total']}, '" . Carbon::now() . "', '" . Carbon::now() . "')";
+    //     //         }
+
+    //     //         // Execute the SQL to insert multiple rows into `purchase_details`
+    //     //         $valuesString = implode(", ", $values);
+    //     //         DB::statement("
+    //     //             INSERT INTO purchase_details (purchase_id, product_id, quantity, unitcost, total, created_at, updated_at)
+    //     //             VALUES $valuesString
+    //     //         ");
+    //     //     }
+
+    //     //     return redirect()->route('purchases.index')->with('success', 'Purchase has been created!');
+    //     // } catch (\Exception $e) {
+    //     //     // Handle any errors and rollback if necessary
+    //     //     return redirect()->back()->withErrors('An error occurred while creating the purchase: ' . $e->getMessage());
+    //     // }
+    // }
+
+
+
+
 
     public function update(Purchase $purchase, Request $request)
     {
