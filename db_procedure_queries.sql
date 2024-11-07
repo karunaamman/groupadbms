@@ -145,3 +145,44 @@ BEGIN
 END #
 DELIMITER ;
 CALL sp_GetProductDetailsById(10);
+
+-- sp_UpdateProduct ----------------------------------------------
+DELIMITER #
+CREATE PROCEDURE sp_UpdateProduct (
+    IN p_product_id INT,
+    IN p_product_image VARCHAR(255),
+    IN p_name VARCHAR(255),
+    IN p_category_id INT,
+    IN p_unit_id INT,
+    IN p_quantity INT,
+    IN p_quantity_alert INT,
+    IN p_tax DECIMAL(10, 2),
+    IN p_notes TEXT
+)
+BEGIN
+    UPDATE products
+    SET 
+        product_image = p_product_image,
+        name = p_name,
+        category_id = p_category_id,
+        unit_id = p_unit_id,
+        quantity = p_quantity,
+        quantity_alert = p_quantity_alert,
+        tax = p_tax,
+        notes = p_notes
+    WHERE 
+        id = p_product_id;
+END #
+DELIMITER ;
+
+CALL sp_UpdateProduct(
+    1, -- product id
+    NULL,                -- pass the image in BLOB format if needed
+    'New Product Name',  -- new product name
+    2,                   -- category_id
+    3,                   -- unit_id
+    100,                 -- quantity
+    10,                  -- quantity_alert
+    15.00,               -- tax
+    'Updated notes'      -- notes
+);
