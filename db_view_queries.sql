@@ -31,3 +31,20 @@ SELECT
 	END AS status
 FROM orders INNER JOIN customers ON orders.customer_id = customers.id 
 ORDER BY STR_TO_DATE(date, '%d-%m-%Y %H:%i:%s') DESC;
+
+
+-- vw_AllProducts ---------------------------------------------------------------
+CREATE VIEW vw_AllProducts AS
+SELECT 
+    p.id AS product_id,
+    p.name AS product_name,
+    p.code AS product_code,
+    c.name AS category_name,
+    p.quantity
+FROM 
+    products p
+JOIN 
+    categories c ON p.category_id = c.id
+ORDER BY 
+    p.created_at DESC;
+SELECT * FROM vw_AllProducts;
