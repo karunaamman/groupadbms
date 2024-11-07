@@ -189,16 +189,21 @@ CALL sp_UpdateProduct(
 
 -- CREATE DELETED_PRODUCTS TABLE --------
 CREATE TABLE IF NOT EXISTS deleted_products AS SELECT * FROM products WHERE 1 = 0;
+ALTER TABLE deleted_products ADD PRIMARY KEY(id);
 
 -- sp_DeleteProductById ----------
 DELIMITER $$
 CREATE PROCEDURE sp_DeleteProductById(IN product_id INT)
 BEGIN
+	DECLARE EXIT HANDLER FOR 1175 
+			BEGIN 
+				SELECT "Couldn't Restore the Product" as errorMessage;
+            END;
     DELETE FROM products
     WHERE id = product_id;
 END $$
 DELIMITER ;
-CALL sp_DeleteProductById(123);
+CALL sp_DeleteProductById(2);
 
 -- trg_BeforeProductDelete ----
 DELIMITER $$
@@ -216,15 +221,18 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE sp_RestoreProduct(IN product_id INT)
 BEGIN
+	DECLARE EXIT HANDLER FOR 1175 
+			BEGIN 
+				SELECT "Couldn't Restore the Product" as errorMessage;
+            END;
     -- Restore the product from the deleted_products table to the products table
     INSERT INTO products (id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at)
     SELECT id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at
-    FROM deleted_products
-    WHERE id = product_id;
+    FROM deleted_products WHERE id = product_id;
 
     -- Optionally, remove the restored product from the deleted_products table
     DELETE FROM deleted_products
     WHERE id = product_id;
 END $$
 DELIMITER ;
-CALL sp_RestoreProduct(123);
+CALL sp_RestoreProduct(2);
