@@ -49,3 +49,13 @@ JOIN
 ORDER BY 
     p.created_at DESC;
 SELECT * FROM vw_AllProducts;
+
+-- vw_CategoryNames -----------------------------------------------------------
+CREATE VIEW vw_CategoryNames AS
+SELECT 
+    id AS category_id,
+    name AS category_name
+FROM 
+    categories;
+
+SELECT * FROM vw_CategoryNames;
