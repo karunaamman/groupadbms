@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\DB;
 use App\Models\Supplier;
 use App\Http\Requests\Supplier\StoreSupplierRequest;
 use App\Http\Requests\Supplier\UpdateSupplierRequest;
@@ -10,7 +10,8 @@ class SupplierController extends Controller
 {
     public function index()
     {
-        $suppliers = Supplier::all();
+        // $suppliers = Supplier::all();
+        $suppliers = collect(DB::select('SELECT * FROM suppliers'));
 
         return view('suppliers.index', [
             'suppliers' => $suppliers
@@ -24,20 +25,47 @@ class SupplierController extends Controller
 
     public function store(StoreSupplierRequest $request)
     {
-        $supplier = Supplier::create($request->all());
+        // $supplier = Supplier::create($request->all());
 
-        /**
-         * Handle upload an image
-         */
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $filename = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
+        // /**
+        //  * Handle upload an image
+        //  */
+        // if($request->hasFile('photo')){
+        //     $file = $request->file('photo');
+        //     $filename = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
 
-            $file->storeAs('suppliers/', $filename, 'public');
-            $supplier->update([
-                'photo' => $filename
-            ]);
-        }
+        //     $file->storeAs('suppliers/', $filename, 'public');
+        //     $supplier->update([
+        //         'photo' => $filename
+        //     ]);
+        // }
+
+        // Exclude both 'photo' and '_token' from the insert data
+    $supplierData = $request->except(['photo', '_token']);
+    $columns = implode(', ', array_keys($supplierData));
+    $placeholders = implode(', ', array_fill(0, count($supplierData), '?'));
+    $values = array_values($supplierData);
+
+    // Insert supplier data into the database
+    DB::insert("INSERT INTO suppliers ($columns) VALUES ($placeholders)", $values);
+
+    /**
+     * Handle upload of an image
+     */
+    if ($request->hasFile('photo')) {
+        $file = $request->file('photo');
+        $filename = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+
+        // Store the file in the public disk under suppliers/ directory
+        $file->storeAs('suppliers/', $filename, 'public');
+
+        // Retrieve the inserted supplier ID (assuming auto-increment ID)
+        $supplierId = DB::getPdo()->lastInsertId();
+
+        // Update the supplier record with the photo filename
+        DB::update("UPDATE suppliers SET photo = ? WHERE id = ?", [$filename, $supplierId]);
+    }
+
 
         return redirect()
             ->route('suppliers.index')
