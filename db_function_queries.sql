@@ -108,27 +108,22 @@ DELIMITER ;
 SELECT fn_TodayQuotationsCount();
 
 
+-- 8 InvoiceGenerate ===========================================================================================
+DELIMITER #
+CREATE FUNCTION fn_InvoiceGenerate() RETURNS VARCHAR(20) DETERMINISTIC
+BEGIN
+    DECLARE lastInvNo VARCHAR(20);
+    DECLARE lastInvNum BIGINT;
+    DECLARE newInvNo VARCHAR(20);
 
+    SELECT invoice_no INTO lastInvNo FROM orders 
+    ORDER BY STR_TO_DATE(order_date, '%Y-%m-%d %H:%i:%s') DESC LIMIT 1;
+    
+    SET lastInvNum = CAST(SUBSTRING(lastInvNo, 5) AS UNSIGNED) + 1;
+    SET newInvNo = CONCAT('INV-', lastInvNum);
+    RETURN newInvNo;
+END #
+DELIMITER ;
 
--- views =======================================================================================================
+SELECT fn_InvoiceGenerate();
 
--- MonthlyOrders ------------------------------
-CREATE VIEW vw_MonthlyOrders AS
-SELECT COUNT(*) AS order_count, DATE_FORMAT(order_date, '%M %Y') AS month_year, SUM(total) AS total_amount
-FROM orders 
-GROUP BY DATE_FORMAT(order_date, '%M %Y')
-ORDER BY MIN(order_date) DESC LIMIT 12;
-
--- MonthlyPurchases --------------------------
-CREATE VIEW vw_MonthlyPurchases AS
-SELECT COUNT(*) AS purchase_count, DATE_FORMAT(date, '%M %Y') AS month_year, SUM(total_amount) AS total_amount
-FROM purchases 
-GROUP BY DATE_FORMAT(date, '%M %Y')
-ORDER BY MIN(date) DESC LIMIT 12;
-
-
--- indexes --
-CREATE INDEX idx_product_name ON products(name);
-
-CREATE UNIQUE INDEX idx_unique_invoice_no ON orders(invoice_no);
-CREATE INDEX idx_composite_order_date_total ON orders(order_date,total);
