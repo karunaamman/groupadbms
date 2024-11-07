@@ -56,12 +56,12 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-green text-white">
-                                    {{ Number::currency($order->pay, 'EUR') }}
+                                    {{ Number::currency($order->pay, 'LKR') }}
                                 </span>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-yellow text-white">
-                                    {{ Number::currency($order->due, 'EUR') }}
+                                    {{ Number::currency($order->due, 'LKR') }}
                                 </span>
                             </td>
                             <td class="text-center">

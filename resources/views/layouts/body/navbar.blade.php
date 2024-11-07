@@ -71,7 +71,10 @@
                                         {{ __('All') }}
                                     </a>
                                     <a class="dropdown-item" href="{{ route('purchases.approvedPurchases') }}">
-                                        {{ __('Approval') }}
+                                        {{ __('Approved') }}
+                                    </a>
+                                    <a class="dropdown-item" href="{{ route('purchases.pending-purchases') }}">
+                                        {{ __('Pending Perchases') }}
                                     </a>
                                     <a class="dropdown-item" href="{{ route('purchases.dailyPurchaseReport') }}">
                                         {{ __('Daily Purchase Report') }}
