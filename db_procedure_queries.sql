@@ -112,3 +112,36 @@ END #
 DELIMITER ;
 CALL sp_UpdateOrderStatus(56, 'pending');
 
+-- sp_GetProductDetailsById --------------------------------------------------------
+DELIMITER #
+CREATE PROCEDURE sp_GetProductDetailsById (
+    IN p_product_id INT
+)
+BEGIN
+    SELECT 
+        p.id AS product_id,
+        p.name AS product_name,
+        p.code AS product_code,
+        p.quantity,
+        p.buying_price,
+        p.selling_price,
+        p.quantity_alert,
+        p.tax,
+        p.tax_type,
+        p.notes,
+        p.product_image,
+        p.created_at,
+        p.updated_at,
+        c.name AS category_name,
+        u.short_code AS unit_short_code
+    FROM 
+        products p
+    JOIN 
+        categories c ON p.category_id = c.id
+    JOIN 
+        units u ON p.unit_id = u.id
+    WHERE 
+        p.id = p_product_id;
+END #
+DELIMITER ;
+CALL sp_GetProductDetailsById(10);
