@@ -37,6 +37,7 @@ ORDER BY STR_TO_DATE(date, '%d-%m-%Y %H:%i:%s') DESC;
 CREATE VIEW vw_AllProducts AS
 SELECT 
     p.id AS product_id,
+    p.slug as slug,
     p.name AS product_name,
     p.code AS product_code,
     c.name AS category_name,
