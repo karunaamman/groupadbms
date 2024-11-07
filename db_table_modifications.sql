@@ -24,3 +24,7 @@ MODIFY COLUMN created_at timestamp NOT NULL default current_timestamp();
 
 ALTER TABLE categories
 MODIFY COLUMN created_at timestamp NOT NULL default current_timestamp();
+
+-- CREATE DELETED_PRODUCTS TABLE --------
+CREATE TABLE IF NOT EXISTS deleted_products AS SELECT * FROM products WHERE 1 = 0;
+ALTER TABLE deleted_products ADD PRIMARY KEY(id);

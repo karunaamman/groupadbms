@@ -30,3 +30,16 @@ BEGIN
     WHERE id = NEW.order_id;
 END #
 DELIMITER ;
+
+
+-- trg_BeforeProductDelete ----
+DELIMITER $$
+CREATE TRIGGER trg_BeforeProductDelete
+BEFORE DELETE ON products
+FOR EACH ROW
+BEGIN
+    -- Insert the deleted product into deleted_products table
+    INSERT INTO deleted_products (id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at)
+    VALUES (OLD.id, OLD.name, OLD.slug, OLD.code, OLD.quantity, OLD.buying_price, OLD.selling_price, OLD.quantity_alert, OLD.tax, OLD.tax_type, OLD.notes, OLD.product_image, OLD.category_id, OLD.unit_id, OLD.created_at, OLD.updated_at);
+END $$
+DELIMITER ;

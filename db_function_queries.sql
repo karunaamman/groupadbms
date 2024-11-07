@@ -116,14 +116,25 @@ BEGIN
     DECLARE lastInvNum BIGINT;
     DECLARE newInvNo VARCHAR(20);
 
-    SELECT invoice_no INTO lastInvNo FROM orders 
-    ORDER BY STR_TO_DATE(order_date, '%Y-%m-%d %H:%i:%s') DESC LIMIT 1;
-    
+    -- Check if there are any records in the orders table
+    SELECT invoice_no INTO lastInvNo 
+    FROM orders 
+    ORDER BY STR_TO_DATE(order_date, '%Y-%m-%d %H:%i:%s') DESC 
+    LIMIT 1;
+
+    -- If no record exists, return 'INV-1'
+    IF lastInvNo IS NULL THEN
+        RETURN 'INV-1';
+    END IF;
+
+    -- Otherwise, increment the last invoice number
     SET lastInvNum = CAST(SUBSTRING(lastInvNo, 5) AS UNSIGNED) + 1;
     SET newInvNo = CONCAT('INV-', lastInvNum);
+    
     RETURN newInvNo;
 END #
 DELIMITER ;
+
 
 SELECT fn_InvoiceGenerate();
 
