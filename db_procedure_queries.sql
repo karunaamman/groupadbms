@@ -44,3 +44,70 @@ BEGIN
 END #
 DELIMITER ;
 
+-- sp_GetOrderDetailsById ----------------------------------------------
+
+sp_GetOrderDetailsById
+DELIMITER #
+CREATE PROCEDURE sp_GetOrderDetailsById(IN p_order_id INT)
+BEGIN
+    -- Select product details from order_details and products tables
+    SELECT 
+        p.product_image AS Photo,
+        p.name AS ProductName,
+        p.code AS ProductCode,
+        od.quantity AS Quantity,
+        od.unitcost AS UnitPrice,
+        od.total AS TotalPrice
+    FROM 
+        order_details od
+    JOIN 
+        products p ON od.product_id = p.id
+    WHERE 
+        od.order_id = p_order_id;
+
+    -- Select payment details from orders table
+    SELECT 
+        pay,
+        due,
+        vat,
+        sub_total
+    FROM 
+        orders
+    WHERE 
+        id = p_order_id;
+END #
+DELIMITER ;
+call sp_GetOrderDetailsById(57);
+
+
+--  sp_UpdateOrderStatus --------------------------------------
+DELIMITER #
+CREATE PROCEDURE sp_UpdateOrderStatus(
+    IN p_order_id INT,
+    IN p_status VARCHAR(10)
+)
+BEGIN
+    -- Declare a variable to store the numeric status
+    DECLARE status_value INT;
+
+    -- Set the numeric status based on the string input
+    IF p_status = 'pending' THEN
+        SET status_value = 0;
+    ELSEIF p_status = 'complete' THEN
+        SET status_value = 1;
+    ELSEIF p_status = 'cancel' THEN
+        SET status_value = 2;
+    ELSE
+        -- If the input is invalid, set status_value to NULL (or handle as needed)
+        SET status_value = NULL;
+    END IF;
+
+    -- Update the order status if status_value is not NULL
+    IF status_value IS NOT NULL THEN
+        UPDATE orders
+        SET order_status = status_value
+        WHERE id = p_order_id;
+    END IF;
+END #
+DELIMITER ;
+CALL sp_UpdateOrderStatus(56, 'pending');
