@@ -186,3 +186,45 @@ CALL sp_UpdateProduct(
     15.00,               -- tax
     'Updated notes'      -- notes
 );
+
+-- CREATE DELETED_PRODUCTS TABLE --------
+CREATE TABLE IF NOT EXISTS deleted_products AS SELECT * FROM products WHERE 1 = 0;
+
+-- sp_DeleteProductById ----------
+DELIMITER $$
+CREATE PROCEDURE sp_DeleteProductById(IN product_id INT)
+BEGIN
+    DELETE FROM products
+    WHERE id = product_id;
+END $$
+DELIMITER ;
+CALL sp_DeleteProductById(123);
+
+-- trg_BeforeProductDelete ----
+DELIMITER $$
+CREATE TRIGGER trg_BeforeProductDelete
+BEFORE DELETE ON products
+FOR EACH ROW
+BEGIN
+    -- Insert the deleted product into deleted_products table
+    INSERT INTO deleted_products (id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at)
+    VALUES (OLD.id, OLD.name, OLD.slug, OLD.code, OLD.quantity, OLD.buying_price, OLD.selling_price, OLD.quantity_alert, OLD.tax, OLD.tax_type, OLD.notes, OLD.product_image, OLD.category_id, OLD.unit_id, OLD.created_at, OLD.updated_at);
+END $$
+DELIMITER ;
+
+-- sp_RestoreProduct ----
+DELIMITER $$
+CREATE PROCEDURE sp_RestoreProduct(IN product_id INT)
+BEGIN
+    -- Restore the product from the deleted_products table to the products table
+    INSERT INTO products (id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at)
+    SELECT id, name, slug, code, quantity, buying_price, selling_price, quantity_alert, tax, tax_type, notes, product_image, category_id, unit_id, created_at, updated_at
+    FROM deleted_products
+    WHERE id = product_id;
+
+    -- Optionally, remove the restored product from the deleted_products table
+    DELETE FROM deleted_products
+    WHERE id = product_id;
+END $$
+DELIMITER ;
+CALL sp_RestoreProduct(123);

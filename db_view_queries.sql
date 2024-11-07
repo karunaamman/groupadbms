@@ -50,8 +50,8 @@ ORDER BY
     p.created_at DESC;
 SELECT * FROM vw_AllProducts;
 
--- vw_CategoryNames -----------------------------------------------------------
-CREATE VIEW vw_CategoryNames AS
+-- vw_CategoryNamesIds -----------------------------------------------------------
+CREATE VIEW vw_CategoryNamesIds AS
 SELECT 
     id AS category_id,
     name AS category_name
@@ -59,3 +59,13 @@ FROM
     categories;
 
 SELECT * FROM vw_CategoryNames;
+
+-- vw_UnitNamesIds
+CREATE VIEW vw_UnitNamesIds AS
+SELECT 
+    id AS unit_id,
+    name AS unit_name
+FROM 
+    units;
+    
+SELECT * FROM vw_UnitNames;
