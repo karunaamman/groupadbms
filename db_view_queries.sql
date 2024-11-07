@@ -74,3 +74,24 @@ SELECT * FROM vw_UnitNames;
 CREATE VIEW vw_Customers AS
 SELECT id AS customer_id, name AS customer_name
 FROM customers;
+
+
+-- vw_SupplierDetails ------------------------
+CREATE VIEW vw_SupplierDetails AS
+SELECT 
+    id,
+    name,
+    email,
+    shop_name,
+    type
+FROM 
+    suppliers;
+
+
+
+--- vw_UserDetails -----------------------------------
+CREATE VIEW vw_UserDetails AS
+SELECT id, name, email, username
+FROM users;
+
+
