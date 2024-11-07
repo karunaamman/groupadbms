@@ -69,3 +69,8 @@ FROM
     units;
     
 SELECT * FROM vw_UnitNames;
+
+-- vw_CustomersNamesId ------------------------
+CREATE VIEW vw_Customers AS
+SELECT id AS customer_id, name AS customer_name
+FROM customers;

@@ -22,7 +22,7 @@ call sp_InsertOrder(80,@orderid);
 SELECT @orderid;
 
 
--- sp_AddOrderDetails
+-- sp_InsertOrderDetails -------------------------------------------------------
 DELIMITER #
 CREATE PROCEDURE sp_InsertOrderDetails(
     IN p_order_id INT,
@@ -62,8 +62,6 @@ DELIMITER ;
 call sp_InsertOrderDetails(@orderid,9,2);
 
 -- sp_GetOrderDetailsById ----------------------------------------------
-
-sp_GetOrderDetailsById
 DELIMITER #
 CREATE PROCEDURE sp_GetOrderDetailsById(IN p_order_id INT)
 BEGIN
