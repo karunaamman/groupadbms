@@ -104,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/purchases/{purchase}/edit', [PurchaseController::class, 'update'])->name('purchases.update');
     Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
 
-    Route::get('/purchases/pending', [PurchaseController::class, 'pendingPurchases'])->name('purchases.pending-purchases');
+    Route::get('/purchases/pending', [PurchaseController::class, 'pendingPurchases'])->name('purchases.pending');
 
 });
 
