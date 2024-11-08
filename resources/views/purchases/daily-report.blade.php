@@ -46,12 +46,12 @@
                                 @forelse ($purchases as $purchase)
                                 <tr>
                                     <td scope="row">{{ $loop->iteration }}</td>
-                                    <td>{{ $purchase->supplier->name }}</td>
+                                    <td>{{ $purchase->supplier_name }}</td>
                                     <td>{{ $purchase->purchase_no }}</td>
-                                    <td>{{ $purchase->purchase_date ? $purchase->purchase_date->format('d-m-Y') : 'N/A' }}</td>
+                                    <td>{{ $purchase->date ? \Carbon\Carbon::parse($purchase->date)->format('d-m-Y') : 'N/A' }}</td>
                                     <td>{{ $purchase->total_amount }}</td>
                                     <td>
-                                        @if ($purchase->purchase_status == 1)
+                                        @if ($purchase->status == 1)
                                             <span class="btn btn-success">Approved</span>
                                         @else
                                             <span class="btn btn-warning">Pending</span>

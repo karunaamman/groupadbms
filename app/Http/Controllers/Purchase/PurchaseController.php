@@ -39,7 +39,7 @@ class PurchaseController extends Controller
     {
         $purchases = DB::select("SELECT * FROM pending_purchases");
 
-        return view('purchases.pending-purchases', compact('purchases'));
+        return view('purchases.pending', compact('purchases'));
 
     }
 
@@ -260,15 +260,32 @@ class PurchaseController extends Controller
         ->with('success', 'Purchase has been deleted!');
 }
 
+    // public function dailyPurchaseReport()
+    // {
+    //     $purchases = Purchase::with(['supplier'])
+    //         //->where('purchase_status', 1)
+    //         ->where('date', today()->format('Y-m-d'))->get();
+
+    //     return view('purchases.daily-report', [
+    //         'purchases' => $purchases,
+    //     ]);
+    // }
+
     public function dailyPurchaseReport()
     {
-        $purchases = Purchase::with(['supplier'])
-            //->where('purchase_status', 1)
-            ->where('date', today()->format('Y-m-d'))->get();
+        // $purchases = DB::select("
+        //     SELECT p.*, s.name as supplier_name
+        //     FROM purchases p
+        //     LEFT JOIN suppliers s ON p.supplier_id = s.id
+        //     WHERE p.date = ?", [today()->format('Y-m-d')]);
+
+        $purchases = DB::select("CALL GetDailyPurchaseReport(?)", [today()->format('Y-m-d')]);
 
         return view('purchases.daily-report', [
             'purchases' => $purchases,
         ]);
+
+        dd($purchases);
     }
 
     public function getPurchaseReport()
