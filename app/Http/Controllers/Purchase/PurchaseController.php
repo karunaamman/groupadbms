@@ -39,7 +39,7 @@ class PurchaseController extends Controller
     {
         $purchases = DB::select("SELECT * FROM pending_purchases");
 
-        return view('purchases.pending-purchases', compact('purchases'));
+        return view('purchases.pending', compact('purchases'));
 
     }
 
