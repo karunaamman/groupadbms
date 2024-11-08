@@ -133,22 +133,11 @@
 
         <ul class="pagination m-0 ms-auto">
             {{ $products->links() }}
-        </ul><a href="/productrestore" onclick="showAlert(event)">
-    <button>Click me</button>
+        </ul><a href="/productrestore">
+    <button style="display: flex; align-items: center; gap: 5px; padding: 8px 12px; font-size: 16px; cursor: pointer; border: none; background-color: #FFC107; color: white; border-radius: 4px;">
+        <i class="fas fa-undo" style="font-size: 16px; margin-right: 5px;"></i> Undo
+    </button>
 </a>
-
-<script>
-    function showAlert(event) {
-        // Show an alert when the button is clicked
-        alert('Product restore process will begin.');
-
-        // Prevent the default behavior (i.e., navigating to /productrestore)
-        event.preventDefault();
-
-        // You can make an AJAX request here or perform any other action you need
-        // For example, sending an AJAX request to the /productrestore route.
-    }
-</script>
 
 
 
