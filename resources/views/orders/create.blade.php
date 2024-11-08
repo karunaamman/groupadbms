@@ -57,7 +57,7 @@
                                         :data="$customers"
                                     />
 
-                                    <div class="col-md-4">
+                                    <!-- <div class="col-md-4">
                                         <label for="reference" class="form-label required">
                                             {{ __('Reference') }}
                                         </label>
@@ -74,7 +74,7 @@
                                             {{ $message }}
                                         </div>
                                         @enderror
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <livewire:order-form :cart-instance="'order'" />
