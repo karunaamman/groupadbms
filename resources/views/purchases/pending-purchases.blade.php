@@ -46,7 +46,7 @@
                                 {{ \Carbon\Carbon::parse($purchase->date)->format('d-m-Y') }}
                             </td>
                             <td class="align-middle text-center">
-                                {{ number_format($purchase->total_amount, 2) }} EUR
+                                {{ number_format($purchase->total_amount, 2) }} LKR
                             </td>
                             <td class="align-middle text-center">
                                 <span class="btn btn-{{ $purchase->status == 1 ? 'success' : 'warning' }} btn-sm text-uppercase">
