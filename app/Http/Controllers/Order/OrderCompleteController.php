@@ -20,5 +20,7 @@ class OrderCompleteController extends Controller
         return view('orders.complete-orders', [
             'orders' => $orders
         ]);
+
+        dd($orders);
     }
 }
